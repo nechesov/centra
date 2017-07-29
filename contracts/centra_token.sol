@@ -43,19 +43,29 @@ pragma solidity ^0.4.11;
       uint256 public constant maxTokens = 100000000*10**18; 
       uint256 public constant ownerSupply = maxTokens*32/100;
       uint256 _totalSupply = ownerSupply;  
-      uint256 public constant token_price = 1/400*10**18; 
-      uint public constant ico_start = 1501200000;
-      uint public constant ico_finish = 1503878400; 
-      uint public constant minValue = 1/10*10**18;      
-      
 
-      uint public constant card_metal_minamount = 100*10**18;
-      uint public constant card_metal_first = 300;
+      uint256 public constant token_price = 1/400*10**18; 
+      uint public constant ico_start = 1501891200;
+      uint public constant ico_finish = 1507248000; 
+      uint public constant minValue = 1*10**18; 
+      uint public constant maxValue = 3000*10**18; 
+      
+      /*
+      uint256 public constant token_price = 1/10000*10**18;
+      uint public constant ico_start = 1501891200;
+      uint public constant ico_finish = 1507248000;
+      uint public constant minValue = 1/10000*10**18; 
+      uint public constant card_metal_minamount = 2/1000*10**18;
+      uint public constant card_gold_minamount  = 1/1000*10**18;
+      */
+
+      uint public constant card_metal_minamount = 40*10**18;
+      uint public constant card_metal_first = 500;
       mapping(address => uint) public cards_metal_check; 
       address[] public cards_metal;
 
-      uint public constant card_gold_minamount  = 20*10**18;
-      uint public constant card_gold_first = 500;
+      uint public constant card_gold_minamount  = 10*10**18;
+      uint public constant card_gold_first = 1000;
       mapping(address => uint) cards_gold_check; 
       address[] public cards_gold;
 
@@ -178,6 +188,7 @@ pragma solidity ^0.4.11;
         if(_totalSupply >= maxTokens) throw;
         if(!(msg.value >= token_price)) throw;
         if(!(msg.value >= minValue)) throw;
+        if(msg.value > maxValue) throw;
 
         uint tokens_buy = msg.value/token_price*10**18;
 
