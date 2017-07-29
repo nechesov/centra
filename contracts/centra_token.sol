@@ -35,7 +35,7 @@ pragma solidity ^0.4.11;
       event Approval(address indexed _owner, address indexed _spender, uint256 _value);
   }  
    
-  contract ERC20 is ERC20Interface {
+  contract CentraToken is ERC20Interface {
       string public constant symbol = "Centra";
       string public constant name = "Centra token";
       uint8 public constant decimals = 18; 
@@ -89,7 +89,7 @@ pragma solidity ^0.4.11;
       }      
    
       // Constructor
-      function ERC20() {
+      function CentraToken() {
           owner = msg.sender;
           balances[owner] = ownerSupply;
       }
