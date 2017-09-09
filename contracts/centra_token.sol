@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.13;
     
    // ----------------------------------------------------------------------------------------------
    // Developer Nechesov Andrey: Facebook.com/Nechesov   
@@ -36,6 +36,7 @@ pragma solidity ^0.4.11;
   }  
    
   contract CentraToken is ERC20Interface {
+
       string public constant symbol = "Centra";
       string public constant name = "Centra token";
       uint8 public constant decimals = 18; 
@@ -47,27 +48,34 @@ pragma solidity ^0.4.11;
       uint256 public constant token_price = 1/400*10**18; 
       uint public constant ico_start = 1501891200;
       uint public constant ico_finish = 1507248000; 
-      uint public constant minValue = 1*10**18; 
-      uint public constant maxValue = 3000*10**18; 
-      
-      /*
-      uint256 public constant token_price = 1/10000*10**18;
-      uint public constant ico_start = 1501891200;
-      uint public constant ico_finish = 1507248000;
-      uint public constant minValue = 1/10000*10**18; 
-      uint public constant card_metal_minamount = 2/1000*10**18;
-      uint public constant card_gold_minamount  = 1/1000*10**18;
-      */
+      uint public constant minValuePre = 1/10*10**18; 
+      uint public constant minValue = 1/10*10**18; 
+      uint public constant maxValue = 3000*10**18;       
 
-      uint public constant card_metal_minamount = 40*10**18;
-      uint public constant card_metal_first = 500;
-      mapping(address => uint) public cards_metal_check; 
-      address[] public cards_metal;
-
-      uint public constant card_gold_minamount  = 10*10**18;
+      uint public constant card_gold_minamount  = 30*10**18;
       uint public constant card_gold_first = 1000;
       mapping(address => uint) cards_gold_check; 
       address[] public cards_gold;
+
+      uint public constant card_black_minamount = 100*10**18;
+      uint public constant card_black_first = 500;
+      mapping(address => uint) public cards_black_check; 
+      address[] public cards_black;
+
+      uint public constant card_titanium_minamount  = 500*10**18;
+      uint public constant card_titanium_first = 200;
+      mapping(address => uint) cards_titanium_check; 
+      address[] public cards_titanium;
+
+      uint public constant card_blue_minamount  = 5/10*10**18;
+      uint public constant card_blue_first = 100000000;
+      mapping(address => uint) cards_blue_check; 
+      address[] public cards_blue;
+
+      uint public constant card_start_minamount  = 1/10*10**18;
+      uint public constant card_start_first = 100000000;
+      mapping(address => uint) cards_start_check; 
+      address[] public cards_start;
 
       using SafeMath for uint;      
       
@@ -170,21 +178,36 @@ pragma solidity ^0.4.11;
      function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
          return allowed[_owner][_spender];
      }
-     //get total metal cards
-    function cards_metal_total() constant returns (uint) { 
-      return cards_metal.length;
+     //get total black cards
+    function cards_black_total() constant returns (uint) { 
+      return cards_black.length;
     }
     //get total gold cards
     function cards_gold_total() constant returns (uint) { 
       return cards_gold.length;
     }    
+    //get total titanium cards
+    function cards_titanium_total() constant returns (uint) { 
+      return cards_titanium.length;
+    }
+    //get total blue cards
+    function cards_blue_total() constant returns (uint) { 
+      return cards_blue.length;
+    }
+
+    //get total start cards
+    function cards_start_total() constant returns (uint) { 
+      return cards_start.length;
+    }
 
       /**
-      * Buy tokens 
+      * Buy tokens pre-sale and sale 
       */
       function tokens_buy() payable returns (bool) { 
 
-        if((now < ico_start)||(now > ico_finish)) throw;        
+        uint tnow = now;
+        
+        if(tnow > ico_finish) throw;        
         if(_totalSupply >= maxTokens) throw;
         if(!(msg.value >= token_price)) throw;
         if(!(msg.value >= minValue)) throw;
@@ -192,10 +215,12 @@ pragma solidity ^0.4.11;
 
         uint tokens_buy = msg.value/token_price*10**18;
 
-        if(!(tokens_buy > 0)) throw;        
+        if(!(tokens_buy > 0)) throw;   
 
-        uint tnow = now;
-
+        if(tnow < ico_start){
+          if(!(msg.value >= minValuePre)) throw;
+          tokens_buy = tokens_buy*125/100;
+        } 
         if((ico_start + 86400*0 <= tnow)&&(tnow < ico_start + 86400*2)){
           tokens_buy = tokens_buy*120/100;
         } 
@@ -208,22 +233,50 @@ pragma solidity ^0.4.11;
 
         if(_totalSupply.add(tokens_buy) > maxTokens) throw;
         _totalSupply = _totalSupply.add(tokens_buy);
-        balances[msg.sender] = balances[msg.sender].add(tokens_buy);        
-
-        if((msg.value >= card_metal_minamount)
-          &&(cards_metal.length < card_metal_first)
-          &&(cards_metal_check[msg.sender] != 1)
-          ) {
-          cards_metal.push(msg.sender);
-          cards_metal_check[msg.sender] = 1;
-        }
+        balances[msg.sender] = balances[msg.sender].add(tokens_buy); 
 
         if((msg.value >= card_gold_minamount)
+          &&(msg.value < card_black_minamount)
           &&(cards_gold.length < card_gold_first)
           &&(cards_gold_check[msg.sender] != 1)
           ) {
           cards_gold.push(msg.sender);
           cards_gold_check[msg.sender] = 1;
+        }       
+
+        if((msg.value >= card_black_minamount)
+          &&(msg.value < card_titanium_minamount)
+          &&(cards_black.length < card_black_first)
+          &&(cards_black_check[msg.sender] != 1)
+          ) {
+          cards_black.push(msg.sender);
+          cards_black_check[msg.sender] = 1;
+        }        
+
+        if((msg.value >= card_titanium_minamount)
+          &&(cards_titanium.length < card_titanium_first)
+          &&(cards_titanium_check[msg.sender] != 1)
+          ) {
+          cards_titanium.push(msg.sender);
+          cards_titanium_check[msg.sender] = 1;
+        }
+
+        if((msg.value >= card_blue_minamount)
+          &&(msg.value < card_gold_minamount)
+          &&(cards_blue.length < card_blue_first)
+          &&(cards_blue_check[msg.sender] != 1)
+          ) {
+          cards_blue.push(msg.sender);
+          cards_blue_check[msg.sender] = 1;
+        }
+
+        if((msg.value >= card_start_minamount)
+          &&(msg.value < card_blue_minamount)
+          &&(cards_start.length < card_start_first)
+          &&(cards_start_check[msg.sender] != 1)
+          ) {
+          cards_start.push(msg.sender);
+          cards_start_check[msg.sender] = 1;
         }
 
         return true;
